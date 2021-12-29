@@ -16,12 +16,12 @@ services:
     logging:
       driver: "local"
   
-  file-myapp:
-    container_name: file-myapp
-    image: alpine
-    volumes:
-    - ./file:/app
-    command: [ /bin/sh , -c , "chmod +x /app/app.sh && ./app/app.sh"]   
+#   file-myapp:
+#     container_name: file-myapp
+#     image: alpine
+#     volumes:
+#     - ./file:/app
+#     command: [ /bin/sh , -c , "chmod +x /app/app.sh && ./app/app.sh"]   
   
   pylogs-app:
     build:
