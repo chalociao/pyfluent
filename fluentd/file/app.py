@@ -27,7 +27,7 @@ while True:
     # print(datetime.now())
     # time.sleep(5)
     j = json.dumps(logmsg)
-    file_op = open("/app/pylogs.log", "a")
+    file_op = open("/pylogs.log", "a")
     # file_op = open("pylogs.log", "a")
     # print(logmsg, file=file_op)
     # # print("Encode DateTime Object into JSON using custom JSONEncoder")
