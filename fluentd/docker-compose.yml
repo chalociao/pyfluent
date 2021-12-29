@@ -1,0 +1,68 @@
+version: "3"
+services:
+  fluentd:
+    container_name: fluentd
+    user: root
+    build:
+      context: .
+    image: fluentd
+    volumes:
+      - /var/lib/docker/containers:/fluentd/log/containers # Example: Reading docker logs
+      - ./file:/fluentd/log/files/ #Example: Reading logs from a file
+      - ./config:/fluentd/etc/
+      - ./logs:/output/ # Example: Fluentd will collect logs and store it here for demo
+    ports:
+      - "24224:24224"
+    logging:
+      driver: "local"
+  
+  file-myapp:
+    container_name: file-myapp
+    image: alpine
+    volumes:
+    - ./file:/app
+    command: [ /bin/sh , -c , "chmod +x /app/app.sh && ./app/app.sh"]   
+  
+  pylogs-app:
+    build:
+      context: file/
+    container_name: pylogs-app
+    volumes:
+    - ./file:/app
+    # command: [ python3 , -c , "chmod +x /app/app.py && /app/app.py"]
+
+  elasticsearch: # port 9200
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.15.1
+    container_name: elasticsearch
+    ports:
+      - "9200:9200"
+    environment:
+      - discovery.type=single-node
+    # - node.name=elasticsearch
+    # - cluster.initial_master_nodes=elasticsearch
+    # - bootstrap.memory_lock=true
+    # - "ES_JAVA_OPTS=-Xms256m -Xmx256m"
+      # - network.bind_host=0.0.0.0
+      - network.host=0.0.0.0
+    # - xpack.security.enabled=false
+    # - xpack.monitoring.enabled=false
+    # - xpack.watcher.enabled=false
+    # - xpack.ml.enabled=false
+    # - http.cors.enabled=true
+    # - http.cors.allow-origin="*"
+    # - http.cors.allow-methods='OPTIONS, HEAD, GET, POST, PUT, DELETE'
+    # - http.cors.allow-headers='X-Requested-With,X-Auth-Token,Content-Type, Content-Length'
+    # - logger.level=debug
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:7.15.1
+    container_name: kibana
+    ports:
+      - "5601:5601"
+    environment:
+      ELASTICSEARCH_URL: http://elasticsearch:9200
+      ELASTICSEARCH_HOSTS: http://elasticsearch:9200
